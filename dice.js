@@ -1,8 +1,10 @@
 /*dice.js*/
 const { trace, metrics } = require('@opentelemetry/api');
+const logsAPI = require('@opentelemetry/api-logs');
 
 const tracer = trace.getTracer('dice-lib');
 const meter = metrics.getMeter('dice-lib');
+const logger = logsAPI.logs.getLogger('dice-lib');
 
 const counter = meter.createCounter('dice-lib.rolls.counter');
 
@@ -22,6 +24,12 @@ function rollOnce(i, min, max) {
   
   
   function rollTheDice(rolls, min, max) {
+    logger.emit({
+      severityNumber: logsAPI.SeverityNumber.INFO,
+      severityText: 'INFO',
+      body: 'rollTheDice called',
+      attributes: { 'log.type': 'LogRecord' },
+    });
     // Create a span. A span must be closed.
     return tracer.startActiveSpan('rollTheDice',
         { attributes: { 'dice-lib.rolls': rolls.toString() } },
